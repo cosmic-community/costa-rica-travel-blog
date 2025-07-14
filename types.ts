@@ -1,126 +1,93 @@
-// Base Cosmic object interface
-interface CosmicObject {
+export interface CosmicFile {
+  url: string;
+  imgix_url: string;
+}
+
+export interface CosmicSelectOption {
+  key: string;
+  value: string;
+}
+
+export interface ProductMetadata {
+  product_name: string;
+  description: string;
+  price: number;
+  product_images: CosmicFile[];
+  category: CosmicSelectOption;
+  stock_status: CosmicSelectOption;
+  featured: boolean;
+  sku?: string;
+}
+
+export interface Product {
   id: string;
-  slug: string;
   title: string;
-  content?: string;
-  metadata: Record<string, any>;
-  type: string;
+  slug: string;
+  metadata: ProductMetadata;
   created_at: string;
-  modified_at: string;
-  status?: string;
+}
+
+export interface AuthorMetadata {
+  name: string;
+  bio?: string;
+  profile_photo?: CosmicFile;
+  email?: string;
+  website?: string;
+  instagram?: string;
+  twitter?: string;
+}
+
+export interface Author {
+  id: string;
+  title: string;
+  slug: string;
+  metadata: AuthorMetadata;
+}
+
+export interface CategoryMetadata {
+  name: string;
+  description?: string;
+  color?: string;
+}
+
+export interface Category {
+  id: string;
+  title: string;
+  slug: string;
+  metadata: CategoryMetadata;
+}
+
+export interface PostMetadata {
+  title: string;
+  excerpt?: string;
+  content: string;
+  featured_image?: CosmicFile;
+  author?: Author;
+  category?: Category;
+  tags?: string;
+  read_time?: number;
+}
+
+export interface Post {
+  id: string;
+  title: string;
+  slug: string;
+  metadata: PostMetadata;
+  created_at: string;
   published_at?: string;
-  thumbnail?: string;
 }
 
-// Category interface
-interface Category extends CosmicObject {
-  type: 'categories';
-  metadata: {
-    name?: string;
-    description?: string;
-    color?: string;
-  };
+export interface ContactFormData {
+  name: string;
+  email: string;
+  message: string;
 }
 
-// Author interface
-interface Author extends CosmicObject {
-  type: 'authors';
-  metadata: {
-    name?: string;
-    bio?: string;
-    profile_photo?: {
-      url: string;
-      imgix_url: string;
-    };
-    email?: string;
-    website?: string;
-    instagram?: string;
-    twitter?: string;
-  };
+export interface SearchResult {
+  id: string;
+  title: string;
+  slug: string;
+  type: 'posts' | 'products' | 'authors' | 'categories';
+  excerpt?: string;
+  metadata: any;
 }
-
-// Post interface
-interface Post extends CosmicObject {
-  type: 'posts';
-  metadata: {
-    title?: string;
-    excerpt?: string;
-    content?: string;
-    featured_image?: {
-      url: string;
-      imgix_url: string;
-    };
-    author?: Author;
-    category?: Category;
-    tags?: string;
-    read_time?: number;
-  };
-}
-
-// Product interface
-interface Product extends CosmicObject {
-  type: 'products';
-  metadata: {
-    product_name?: string;
-    description?: string;
-    price?: number;
-    product_images?: Array<{
-      url: string;
-      imgix_url: string;
-    }>;
-    category?: 'Apparel' | 'Accessories' | 'Drinkware';
-    stock_status?: 'In Stock' | 'Out of Stock' | 'Limited Stock';
-    featured?: boolean;
-    sku?: string;
-  };
-}
-
-// API response types
-interface CosmicResponse<T> {
-  objects: T[];
-  total: number;
-  limit?: number;
-  skip?: number;
-}
-
-interface CosmicSingleResponse<T> {
-  object: T;
-}
-
-// Type guards
-function isPost(obj: CosmicObject): obj is Post {
-  return obj.type === 'posts';
-}
-
-function isAuthor(obj: CosmicObject): obj is Author {
-  return obj.type === 'authors';
-}
-
-function isCategory(obj: CosmicObject): obj is Category {
-  return obj.type === 'categories';
-}
-
-function isProduct(obj: CosmicObject): obj is Product {
-  return obj.type === 'products';
-}
-
-// Utility types - Fixed to properly constrain generic type
-type OptionalMetadata<T extends CosmicObject> = Partial<T['metadata']>;
-type CreatePostData = Omit<Post, 'id' | 'created_at' | 'modified_at'>;
-type CreateProductData = Omit<Product, 'id' | 'created_at' | 'modified_at'>;
-
-export type {
-  CosmicObject,
-  Category,
-  Author,
-  Post,
-  Product,
-  CosmicResponse,
-  CosmicSingleResponse,
-  OptionalMetadata,
-  CreatePostData,
-  CreateProductData,
-};
-
-export { isPost, isAuthor, isCategory, isProduct };

@@ -7,7 +7,10 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const productImage = product.metadata.product_images?.[0];
-  const stockStatusColors = {
+  const stockStatus = product.metadata.stock_status?.value || 'In Stock';
+  const category = product.metadata.category?.value || 'General';
+  
+  const stockStatusColors: Record<string, string> = {
     'In Stock': 'bg-green-100 text-green-800',
     'Out of Stock': 'bg-red-100 text-red-800',
     'Limited Stock': 'bg-yellow-100 text-yellow-800'
@@ -47,20 +50,20 @@ export default function ProductCard({ product }: ProductCardProps) {
           <span className="text-2xl font-bold text-green-600">
             ${product.metadata.price?.toFixed(2)}
           </span>
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${stockStatusColors[product.metadata.stock_status || 'In Stock']}`}>
-            {product.metadata.stock_status || 'In Stock'}
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${stockStatusColors[stockStatus] || stockStatusColors['In Stock']}`}>
+            {stockStatus}
           </span>
         </div>
 
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-500">
-            {product.metadata.category}
+            {category}
           </span>
           <button 
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={product.metadata.stock_status === 'Out of Stock'}
+            disabled={stockStatus === 'Out of Stock'}
           >
-            {product.metadata.stock_status === 'Out of Stock' ? 'Out of Stock' : 'Add to Cart'}
+            {stockStatus === 'Out of Stock' ? 'Out of Stock' : 'Add to Cart'}
           </button>
         </div>
 
