@@ -83,8 +83,8 @@ function isCategory(obj: CosmicObject): obj is Category {
   return obj.type === 'categories';
 }
 
-// Utility types
-type OptionalMetadata<T> = Partial<T['metadata']>;
+// Utility types - Fixed to properly constrain generic type
+type OptionalMetadata<T extends CosmicObject> = Partial<T['metadata']>;
 type CreatePostData = Omit<Post, 'id' | 'created_at' | 'modified_at'>;
 
 export type {
