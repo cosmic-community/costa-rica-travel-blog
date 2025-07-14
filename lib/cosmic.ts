@@ -1,5 +1,5 @@
 import { createBucketClient } from '@cosmicjs/sdk'
-import { Post, Author, Category, CosmicResponse, CosmicSingleResponse } from '@/types'
+import { Post, Author, Category, Product, CosmicResponse, CosmicSingleResponse } from '@/types'
 
 export const cosmic = createBucketClient({
   bucketSlug: process.env.COSMIC_BUCKET_SLUG as string,
@@ -167,5 +167,84 @@ export async function getCategory(slug: string): Promise<Category | null> {
       return null
     }
     throw new Error('Failed to fetch category')
+  }
+}
+
+// Fetch all products
+export async function getProducts(): Promise<Product[]> {
+  try {
+    const response = await cosmic.objects
+      .find({ type: 'products' })
+      .props(['id', 'title', 'slug', 'metadata'])
+      .depth(1)
+    
+    return response.objects as Product[]
+  } catch (error) {
+    if (hasStatus(error) && error.status === 404) {
+      return []
+    }
+    throw new Error('Failed to fetch products')
+  }
+}
+
+// Fetch single product by slug
+export async function getProduct(slug: string): Promise<Product | null> {
+  try {
+    const response = await cosmic.objects
+      .findOne({ type: 'products', slug })
+      .depth(1)
+    
+    const product = response.object as Product
+    
+    if (!product || !product.metadata) {
+      return null
+    }
+    
+    return product
+  } catch (error) {
+    if (hasStatus(error) && error.status === 404) {
+      return null
+    }
+    throw new Error('Failed to fetch product')
+  }
+}
+
+// Fetch products by category
+export async function getProductsByCategory(categoryKey: string): Promise<Product[]> {
+  try {
+    const response = await cosmic.objects
+      .find({ 
+        type: 'products',
+        'metadata.category.key': categoryKey 
+      })
+      .props(['id', 'title', 'slug', 'metadata'])
+      .depth(1)
+    
+    return response.objects as Product[]
+  } catch (error) {
+    if (hasStatus(error) && error.status === 404) {
+      return []
+    }
+    throw new Error('Failed to fetch products by category')
+  }
+}
+
+// Fetch featured products
+export async function getFeaturedProducts(): Promise<Product[]> {
+  try {
+    const response = await cosmic.objects
+      .find({ 
+        type: 'products',
+        'metadata.featured': true 
+      })
+      .props(['id', 'title', 'slug', 'metadata'])
+      .depth(1)
+    
+    return response.objects as Product[]
+  } catch (error) {
+    if (hasStatus(error) && error.status === 404) {
+      return []
+    }
+    throw new Error('Failed to fetch featured products')
   }
 }

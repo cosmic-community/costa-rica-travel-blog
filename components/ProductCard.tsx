@@ -19,22 +19,26 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
       {/* Product Image */}
-      <div className="aspect-square overflow-hidden">
-        <img
-          src={productImage ? `${productImage.imgix_url}?w=600&h=600&fit=crop&auto=format,compress` : '/placeholder-product.jpg'}
-          alt={product.metadata.product_name || product.title}
-          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-          width={300}
-          height={300}
-        />
-      </div>
+      <Link href={`/products/${product.slug}`}>
+        <div className="aspect-square overflow-hidden cursor-pointer">
+          <img
+            src={productImage ? `${productImage.imgix_url}?w=600&h=600&fit=crop&auto=format,compress` : '/placeholder-product.jpg'}
+            alt={product.metadata.product_name || product.title}
+            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            width={300}
+            height={300}
+          />
+        </div>
+      </Link>
 
       {/* Product Info */}
       <div className="p-4">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
-            {product.metadata.product_name || product.title}
-          </h3>
+          <Link href={`/products/${product.slug}`}>
+            <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 hover:text-blue-600 transition-colors cursor-pointer">
+              {product.metadata.product_name || product.title}
+            </h3>
+          </Link>
           {product.metadata.featured && (
             <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
               Featured
@@ -59,12 +63,20 @@ export default function ProductCard({ product }: ProductCardProps) {
           <span className="text-sm text-gray-500">
             {category}
           </span>
-          <button 
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={stockStatus === 'Out of Stock'}
-          >
-            {stockStatus === 'Out of Stock' ? 'Out of Stock' : 'Add to Cart'}
-          </button>
+          <div className="flex gap-2">
+            <Link 
+              href={`/products/${product.slug}`}
+              className="bg-gray-100 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-200 transition-colors duration-200 text-sm"
+            >
+              View Details
+            </Link>
+            <button 
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              disabled={stockStatus === 'Out of Stock'}
+            >
+              {stockStatus === 'Out of Stock' ? 'Out of Stock' : 'Add to Cart'}
+            </button>
+          </div>
         </div>
 
         {product.metadata.sku && (
