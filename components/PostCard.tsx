@@ -13,13 +13,15 @@ export default function PostCard({ post }: PostCardProps) {
         {/* Featured Image */}
         {post.metadata?.featured_image && (
           <div className="md:w-1/3">
-            <img
-              src={`${post.metadata.featured_image.imgix_url}?w=600&h=400&fit=crop&auto=format,compress`}
-              alt={post.title}
-              className="w-full h-48 md:h-full object-cover"
-              width={300}
-              height={200}
-            />
+            <Link href={`/posts/${post.slug}`}>
+              <img
+                src={`${post.metadata.featured_image.imgix_url}?w=600&h=400&fit=crop&auto=format,compress`}
+                alt={post.title}
+                className="w-full h-48 md:h-full object-cover hover:opacity-90 transition-opacity cursor-pointer"
+                width={300}
+                height={200}
+              />
+            </Link>
           </div>
         )}
         
