@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
@@ -14,7 +14,7 @@ function normalizeQuery(query: string): string {
   return query.trim().replace(/\s+/g, ' ')
 }
 
-export default function SearchBar({ 
+function SearchBarContent({ 
   initialQuery = '', 
   placeholder = 'Search posts...',
   showResults = false 
@@ -178,5 +178,19 @@ export default function SearchBar({
         </form>
       )}
     </div>
+  )
+}
+
+export default function SearchBar(props: SearchBarProps) {
+  return (
+    <Suspense fallback={
+      <div className="relative">
+        <div className="p-2 text-gray-700">
+          <MagnifyingGlassIcon className="h-5 w-5" />
+        </div>
+      </div>
+    }>
+      <SearchBarContent {...props} />
+    </Suspense>
   )
 }

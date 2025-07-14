@@ -7,13 +7,25 @@ interface SearchPageProps {
   searchParams: Promise<{ q?: string }>
 }
 
-export default async function SearchPage({ searchParams }: SearchPageProps) {
+async function SearchContent({ searchParams }: SearchPageProps) {
   const { q = '' } = await searchParams
   
   // Properly decode and normalize the query parameter
   const query = decodeURIComponent(q.toString()).trim()
   const posts = query ? await searchPosts(query) : []
 
+  return (
+    <>
+      {/* Search Bar */}
+      <SearchBar initialQuery={query} showResults={true} />
+
+      {/* Search Results */}
+      <SearchResults posts={posts} query={query} />
+    </>
+  )
+}
+
+export default function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
@@ -24,12 +36,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <p className="text-gray-600">Find your next Costa Rica adventure</p>
           </div>
 
-          {/* Search Bar */}
-          <SearchBar initialQuery={query} showResults={true} />
-
-          {/* Search Results */}
-          <Suspense fallback={<SearchResults posts={[]} query={query} loading={true} />}>
-            <SearchResults posts={posts} query={query} />
+          {/* Search Content with Suspense */}
+          <Suspense fallback={
+            <div className="space-y-6">
+              <div className="w-full max-w-2xl mx-auto mb-8">
+                <div className="relative">
+                  <div className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg bg-gray-100 animate-pulse h-12"></div>
+                </div>
+              </div>
+              <SearchResults posts={[]} query="" loading={true} />
+            </div>
+          }>
+            <SearchContent searchParams={searchParams} />
           </Suspense>
         </div>
       </div>
