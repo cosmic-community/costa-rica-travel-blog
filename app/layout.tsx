@@ -1,37 +1,28 @@
-import './globals.css'
+import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { getCategories } from '@/lib/cosmic'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Costa Rica Travel Blog',
-  description: 'Discover the wonders of Costa Rica through expert travel guides, wildlife photography, and cultural insights.',
-  keywords: 'Costa Rica, travel, adventure, wildlife, beaches, culture, tourism',
-  authors: [{ name: 'Costa Rica Travel Blog' }],
-  openGraph: {
-    title: 'Costa Rica Travel Blog',
-    description: 'Discover the wonders of Costa Rica through expert travel guides, wildlife photography, and cultural insights.',
-    type: 'website',
-    locale: 'en_US',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Costa Rica Travel Blog',
-    description: 'Discover the wonders of Costa Rica through expert travel guides, wildlife photography, and cultural insights.',
-  },
+  description: 'Discover the best destinations, adventures, and hidden gems in Costa Rica',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const categories = await getCategories()
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header />
+        <Header categories={categories} />
         <main className="min-h-screen">
           {children}
         </main>
