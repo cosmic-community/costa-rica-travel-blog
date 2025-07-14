@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  
+  body {
+    @apply text-gray-900 bg-gray-50;
+  }
+}
+
+@layer components {
+  .prose-custom {
+    @apply prose prose-lg max-w-none;
+  }
+  
+  .prose-custom h1 {
+    @apply text-3xl font-bold text-gray-900 mb-4;
+  }
+  
+  .prose-custom h2 {
+    @apply text-2xl font-semibold text-gray-800 mb-3 mt-6;
+  }
+  
+  .prose-custom h3 {
+    @apply text-xl font-semibold text-gray-800 mb-2 mt-5;
+  }
+  
+  .prose-custom p {
+    @apply mb-4 text-gray-700 leading-relaxed;
+  }
+  
+  .prose-custom ul {
+    @apply mb-4 ml-6 list-disc;
+  }
+  
+  .prose-custom ol {
+    @apply mb-4 ml-6 list-decimal;
+  }
+  
+  .prose-custom li {
+    @apply mb-2 text-gray-700;
+  }
+  
+  .prose-custom strong {
+    @apply font-semibold text-gray-900;
+  }
+  
+  .prose-custom a {
+    @apply text-primary hover:text-primary/80 underline;
+  }
+  
+  .prose-custom blockquote {
+    @apply border-l-4 border-primary pl-4 italic text-gray-600 my-4;
+  }
+  
+  .prose-custom code {
+    @apply bg-gray-100 px-1 py-0.5 rounded text-sm font-mono text-gray-800;
+  }
+  
+  .prose-custom pre {
+    @apply bg-gray-100 p-4 rounded-lg overflow-x-auto my-4;
+  }
+  
+  .prose-custom pre code {
+    @apply bg-transparent p-0;
+  }
+}
