@@ -91,3 +91,15 @@ export interface SearchResult {
   excerpt?: string;
   metadata: any;
 }
+
+// Cosmic SDK response types
+export interface CosmicResponse<T = any> {
+  objects: T[];
+  total: number;
+  limit: number;
+  skip: number;
+}
+
+export interface CosmicSingleResponse<T = any> {
+  object: T;
+}
