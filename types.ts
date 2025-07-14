@@ -58,6 +58,24 @@ interface Post extends CosmicObject {
   };
 }
 
+// Product interface
+interface Product extends CosmicObject {
+  type: 'products';
+  metadata: {
+    product_name?: string;
+    description?: string;
+    price?: number;
+    product_images?: Array<{
+      url: string;
+      imgix_url: string;
+    }>;
+    category?: 'Apparel' | 'Accessories' | 'Drinkware';
+    stock_status?: 'In Stock' | 'Out of Stock' | 'Limited Stock';
+    featured?: boolean;
+    sku?: string;
+  };
+}
+
 // API response types
 interface CosmicResponse<T> {
   objects: T[];
@@ -83,19 +101,26 @@ function isCategory(obj: CosmicObject): obj is Category {
   return obj.type === 'categories';
 }
 
+function isProduct(obj: CosmicObject): obj is Product {
+  return obj.type === 'products';
+}
+
 // Utility types - Fixed to properly constrain generic type
 type OptionalMetadata<T extends CosmicObject> = Partial<T['metadata']>;
 type CreatePostData = Omit<Post, 'id' | 'created_at' | 'modified_at'>;
+type CreateProductData = Omit<Product, 'id' | 'created_at' | 'modified_at'>;
 
 export type {
   CosmicObject,
   Category,
   Author,
   Post,
+  Product,
   CosmicResponse,
   CosmicSingleResponse,
   OptionalMetadata,
   CreatePostData,
+  CreateProductData,
 };
 
-export { isPost, isAuthor, isCategory };
+export { isPost, isAuthor, isCategory, isProduct };
