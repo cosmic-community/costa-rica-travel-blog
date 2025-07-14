@@ -10,6 +10,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Costa Rica Travel Blog',
   description: 'Discover the best destinations, adventures, and hidden gems in Costa Rica',
+  icons: {
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌴</text></svg>"
+  }
 }
 
 export default async function RootLayout({
