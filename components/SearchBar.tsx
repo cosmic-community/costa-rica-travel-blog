@@ -1,6 +1,6 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
 interface SearchBarProps {
@@ -19,15 +19,29 @@ export default function SearchBar({
   placeholder = 'Search posts...',
   showResults = false 
 }: SearchBarProps) {
-  const [query, setQuery] = useState(normalizeQuery(initialQuery))
-  const [isExpanded, setIsExpanded] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
   const inputRef = useRef<HTMLInputElement>(null)
+  
+  // Get current query from URL or use initial query
+  const currentQuery = searchParams.get('q') || initialQuery
+  const [query, setQuery] = useState(normalizeQuery(currentQuery))
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  // Update query when URL search params change (synchronization)
+  useEffect(() => {
+    const urlQuery = searchParams.get('q') || ''
+    const normalizedUrlQuery = normalizeQuery(urlQuery)
+    setQuery(normalizedUrlQuery)
+  }, [searchParams])
 
   // Update query when initialQuery changes
   useEffect(() => {
-    setQuery(normalizeQuery(initialQuery))
-  }, [initialQuery])
+    if (initialQuery !== currentQuery) {
+      setQuery(normalizeQuery(initialQuery))
+    }
+  }, [initialQuery, currentQuery])
 
   useEffect(() => {
     if (isExpanded && inputRef.current) {
@@ -35,11 +49,31 @@ export default function SearchBar({
     }
   }, [isExpanded])
 
+  // Update URL with new search query
+  const updateSearchParams = (newQuery: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    const normalizedQuery = normalizeQuery(newQuery)
+    
+    if (normalizedQuery) {
+      params.set('q', normalizedQuery)
+    } else {
+      params.delete('q')
+    }
+    
+    // If we're on the search page, update the current URL
+    if (pathname === '/search') {
+      router.replace(`/search?${params.toString()}`)
+    } else if (normalizedQuery) {
+      // If we're not on search page and there's a query, navigate to search
+      router.push(`/search?${params.toString()}`)
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const normalizedQuery = normalizeQuery(query)
     if (normalizedQuery) {
-      router.push(`/search?q=${encodeURIComponent(normalizedQuery)}`)
+      updateSearchParams(normalizedQuery)
       setIsExpanded(false)
     }
   }
@@ -48,6 +82,13 @@ export default function SearchBar({
     setQuery('')
     if (showResults) {
       router.push('/search')
+    } else {
+      // Clear the search params if we're not on search page
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete('q')
+      if (pathname === '/search') {
+        router.replace('/search')
+      }
     }
   }
 
@@ -59,7 +100,13 @@ export default function SearchBar({
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value)
+    const newValue = e.target.value
+    setQuery(newValue)
+    
+    // For the search page, update URL in real-time to sync with nav bar
+    if (showResults) {
+      updateSearchParams(newValue)
+    }
   }
 
   if (showResults) {
