@@ -43,7 +43,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
             {/* Product Images */}
             <div className="space-y-4">
-              {productImages.length > 0 ? (
+              {productImages.length > 0 && productImages[0] ? (
                 <>
                   <div className="aspect-square overflow-hidden rounded-lg">
                     <img
