@@ -9,7 +9,9 @@ interface SearchPageProps {
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const { q = '' } = await searchParams
-  const query = q.toString()
+  
+  // Properly decode and normalize the query parameter
+  const query = decodeURIComponent(q.toString()).trim()
   const posts = query ? await searchPosts(query) : []
 
   return (

@@ -9,15 +9,25 @@ interface SearchBarProps {
   showResults?: boolean
 }
 
+// Normalize query for consistent handling
+function normalizeQuery(query: string): string {
+  return query.trim().replace(/\s+/g, ' ')
+}
+
 export default function SearchBar({ 
   initialQuery = '', 
   placeholder = 'Search posts...',
   showResults = false 
 }: SearchBarProps) {
-  const [query, setQuery] = useState(initialQuery)
+  const [query, setQuery] = useState(normalizeQuery(initialQuery))
   const [isExpanded, setIsExpanded] = useState(false)
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Update query when initialQuery changes
+  useEffect(() => {
+    setQuery(normalizeQuery(initialQuery))
+  }, [initialQuery])
 
   useEffect(() => {
     if (isExpanded && inputRef.current) {
@@ -27,8 +37,9 @@ export default function SearchBar({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (query.trim()) {
-      router.push(`/search?q=${encodeURIComponent(query.trim())}`)
+    const normalizedQuery = normalizeQuery(query)
+    if (normalizedQuery) {
+      router.push(`/search?q=${encodeURIComponent(normalizedQuery)}`)
       setIsExpanded(false)
     }
   }
@@ -36,7 +47,7 @@ export default function SearchBar({
   const handleClear = () => {
     setQuery('')
     if (showResults) {
-      router.push('/')
+      router.push('/search')
     }
   }
 
@@ -45,6 +56,10 @@ export default function SearchBar({
       setIsExpanded(false)
       inputRef.current?.blur()
     }
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value)
   }
 
   if (showResults) {
@@ -58,7 +73,7 @@ export default function SearchBar({
               ref={inputRef}
               type="text"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
               className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
@@ -97,7 +112,7 @@ export default function SearchBar({
               ref={inputRef}
               type="text"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               onBlur={() => !query && setIsExpanded(false)}
               placeholder={placeholder}

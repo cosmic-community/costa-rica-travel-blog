@@ -5,8 +5,15 @@ function hasStatus(error: unknown): error is { status: number } {
   return typeof error === 'object' && error !== null && 'status' in error;
 }
 
+// Normalize search term for consistent matching
+function normalizeSearchTerm(term: string): string {
+  return term.toLowerCase().trim().replace(/\s+/g, ' ')
+}
+
 export async function searchPosts(query: string): Promise<Post[]> {
-  if (!query.trim()) {
+  const normalizedQuery = normalizeSearchTerm(query)
+  
+  if (!normalizedQuery) {
     return []
   }
 
@@ -14,48 +21,47 @@ export async function searchPosts(query: string): Promise<Post[]> {
     // Get all posts first since Cosmic doesn't have full-text search
     const response = await cosmic.objects
       .find({ type: 'posts' })
-      .props(['id', 'title', 'slug', 'metadata'])
+      .props(['id', 'title', 'slug', 'metadata', 'created_at'])
       .depth(1)
     
     const allPosts = response.objects as Post[]
-    const searchTerm = query.toLowerCase().trim()
     
     // Filter posts based on search query
     const filteredPosts = allPosts.filter((post) => {
-      const title = post.metadata?.title?.toLowerCase() || ''
-      const excerpt = post.metadata?.excerpt?.toLowerCase() || ''
-      const content = post.metadata?.content?.toLowerCase() || ''
-      const tags = post.metadata?.tags?.toLowerCase() || ''
-      const authorName = post.metadata?.author?.metadata?.name?.toLowerCase() || ''
-      const categoryName = post.metadata?.category?.metadata?.name?.toLowerCase() || ''
+      const title = normalizeSearchTerm(post.metadata?.title || '')
+      const excerpt = normalizeSearchTerm(post.metadata?.excerpt || '')
+      const content = normalizeSearchTerm(post.metadata?.content || '')
+      const tags = normalizeSearchTerm(post.metadata?.tags || '')
+      const authorName = normalizeSearchTerm(post.metadata?.author?.metadata?.name || '')
+      const categoryName = normalizeSearchTerm(post.metadata?.category?.metadata?.name || '')
       
       return (
-        title.includes(searchTerm) ||
-        excerpt.includes(searchTerm) ||
-        content.includes(searchTerm) ||
-        tags.includes(searchTerm) ||
-        authorName.includes(searchTerm) ||
-        categoryName.includes(searchTerm)
+        title.includes(normalizedQuery) ||
+        excerpt.includes(normalizedQuery) ||
+        content.includes(normalizedQuery) ||
+        tags.includes(normalizedQuery) ||
+        authorName.includes(normalizedQuery) ||
+        categoryName.includes(normalizedQuery)
       )
     })
     
     // Sort by relevance (title matches first, then excerpt, then content)
     const sortedPosts = filteredPosts.sort((a, b) => {
-      const aTitle = a.metadata?.title?.toLowerCase() || ''
-      const bTitle = b.metadata?.title?.toLowerCase() || ''
-      const aExcerpt = a.metadata?.excerpt?.toLowerCase() || ''
-      const bExcerpt = b.metadata?.excerpt?.toLowerCase() || ''
+      const aTitle = normalizeSearchTerm(a.metadata?.title || '')
+      const bTitle = normalizeSearchTerm(b.metadata?.title || '')
+      const aExcerpt = normalizeSearchTerm(a.metadata?.excerpt || '')
+      const bExcerpt = normalizeSearchTerm(b.metadata?.excerpt || '')
       
       // Title matches get highest priority
-      const aTitleMatch = aTitle.includes(searchTerm)
-      const bTitleMatch = bTitle.includes(searchTerm)
+      const aTitleMatch = aTitle.includes(normalizedQuery)
+      const bTitleMatch = bTitle.includes(normalizedQuery)
       
       if (aTitleMatch && !bTitleMatch) return -1
       if (!aTitleMatch && bTitleMatch) return 1
       
       // Excerpt matches get second priority
-      const aExcerptMatch = aExcerpt.includes(searchTerm)
-      const bExcerptMatch = bExcerpt.includes(searchTerm)
+      const aExcerptMatch = aExcerpt.includes(normalizedQuery)
+      const bExcerptMatch = bExcerpt.includes(normalizedQuery)
       
       if (aExcerptMatch && !bExcerptMatch) return -1
       if (!aExcerptMatch && bExcerptMatch) return 1
@@ -74,7 +80,9 @@ export async function searchPosts(query: string): Promise<Post[]> {
 }
 
 export async function getSearchSuggestions(query: string): Promise<string[]> {
-  if (!query.trim()) {
+  const normalizedQuery = normalizeSearchTerm(query)
+  
+  if (!normalizedQuery) {
     return []
   }
 
@@ -85,7 +93,6 @@ export async function getSearchSuggestions(query: string): Promise<string[]> {
       .depth(1)
     
     const allPosts = response.objects as Post[]
-    const searchTerm = query.toLowerCase().trim()
     const suggestions: Set<string> = new Set()
     
     allPosts.forEach((post) => {
@@ -93,17 +100,17 @@ export async function getSearchSuggestions(query: string): Promise<string[]> {
       const tags = post.metadata?.tags || ''
       
       // Add matching words from titles
-      const titleWords = title.toLowerCase().split(' ')
+      const titleWords = normalizeSearchTerm(title).split(' ')
       titleWords.forEach(word => {
-        if (word.length > 2 && word.includes(searchTerm)) {
+        if (word.length > 2 && word.includes(normalizedQuery)) {
           suggestions.add(word)
         }
       })
       
       // Add matching tags
-      const tagList = tags.split(',').map(tag => tag.trim().toLowerCase())
+      const tagList = tags.split(',').map(tag => normalizeSearchTerm(tag))
       tagList.forEach(tag => {
-        if (tag.length > 2 && tag.includes(searchTerm)) {
+        if (tag.length > 2 && tag.includes(normalizedQuery)) {
           suggestions.add(tag)
         }
       })
