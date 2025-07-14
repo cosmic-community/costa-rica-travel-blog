@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Product } from '@/types';
+import AddToCartButton from './AddToCartButton';
 
 interface ProductCardProps {
   product: Product;
@@ -70,12 +71,11 @@ export default function ProductCard({ product }: ProductCardProps) {
             >
               View Details
             </Link>
-            <button 
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            <AddToCartButton 
+              product={product}
+              size="sm"
               disabled={stockStatus === 'Out of Stock'}
-            >
-              {stockStatus === 'Out of Stock' ? 'Out of Stock' : 'Add to Cart'}
-            </button>
+            />
           </div>
         </div>
 

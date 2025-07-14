@@ -92,6 +92,51 @@ export interface SearchResult {
   metadata: any;
 }
 
+// Cart and Checkout Types
+export interface CartItem {
+  id: string;
+  product: Product;
+  quantity: number;
+  addedAt: string;
+}
+
+export interface CartSummary {
+  items: CartItem[];
+  totalItems: number;
+  subtotal: number;
+  tax: number;
+  total: number;
+}
+
+export interface CheckoutFormData {
+  // Customer Information
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  
+  // Shipping Address
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  
+  // Additional Information
+  orderNotes?: string;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  customerInfo: CheckoutFormData;
+  items: CartItem[];
+  summary: CartSummary;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Cosmic SDK response types
 export interface CosmicResponse<T = any> {
   objects: T[];
