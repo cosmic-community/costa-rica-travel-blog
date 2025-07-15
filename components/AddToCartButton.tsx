@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { ShoppingCart } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { Product } from '@/types';
 
@@ -104,9 +105,7 @@ export default function AddToCartButton({
           'Out of Stock'
         ) : (
           <>
-            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 9M7 13l-1.5 9m0 0h9" />
-            </svg>
+            <ShoppingCart className="w-4 h-4 mr-1" />
             {currentQuantity > 0 ? `In Cart (${currentQuantity})` : 'Add to Cart'}
           </>
         )}
